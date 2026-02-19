@@ -121,32 +121,21 @@ def call_cohere(prompt):
             content={"error": "Model returned invalid JSON"}
         )
 
-
+<-- return dict directly
 @app.post("/analyze")
-async def analyze(file: UploadFile = File(...), drug: str = Form(...)):
-    contents = await file.read()
-    decoded = contents.decode("utf-8", errors="ignore")
+async def analyze(
+    file: UploadFile = File(...),
+    drug: str = Form(...)
+):
+    try:
+        contents = await file.read()
+        decoded = contents.decode("utf-8", errors="ignore")
 
-    parsed = parse_vcf(decoded)
-    prompt = build_prompt(parsed, drug)
+        parsed_data = parse_vcf(decoded)
+        prompt = build_prompt(parsed_data, drug)
+        result = call_cohere(prompt)
 
-    result = call_cohere(prompt)
+        return result
 
-    return result   # <-- return dict directly
-# @app.post("/analyze")
-# async def analyze(
-#     file: UploadFile = File(...),
-#     drug: str = Form(...)
-# ):
-#     try:
-#         contents = await file.read()
-#         decoded = contents.decode("utf-8", errors="ignore")
-
-#         parsed_data = parse_vcf(decoded)
-#         prompt = build_prompt(parsed_data, drug)
-#         result = call_cohere(prompt)
-
-#         return result
-
-#     except Exception as e:
-#         return JSONResponse(status_code=500, content={"error": str(e)})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
