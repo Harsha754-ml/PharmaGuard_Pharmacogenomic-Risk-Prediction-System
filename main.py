@@ -120,7 +120,7 @@ def call_cohere(prompt):
             status_code=500,
             content={"error": "Model returned invalid JSON"}
         )
-    return dict directly
+        
 @app.post("/analyze")
 async def analyze(
     file: UploadFile = File(...),
