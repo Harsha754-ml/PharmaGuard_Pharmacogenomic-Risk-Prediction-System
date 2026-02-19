@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PharmaGuard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>PharmaGuard Precision Risk Engine<br><h3><center>By Team Astroid</center></h3><br></h1>
+    
+    <div class="form-grid">
+
+        <!-- Drug Section -->
+        <div class="form-section">
+            <label class="section-title">Drug Name</label>
+            <input type="text" id="drugName"
+                   placeholder="Enter Drug Name (e.g., TACROLIMUS)">
+        </div>
+
+        <!-- Upload Section -->
+        <div class="form-section">
+            <label class="section-title">Upload VCF File</label>
+            <label class="upload-box" id="uploadBox">
+                <span id="uploadText">Drag & Drop VCF File or Click to Upload</span>
+                <input type="file" id="vcfFile">
+            </label>
+        </div>
+
+    </div>
+
+    <button class="analyze-btn" onclick="analyze()">Analyze Genetic Risk</button>
+
+    <div class="result" id="resultSection">
+        <div id="riskBadge"></div>
+        <pre id="jsonOutput"></pre>
+
+        <div class="actions">
+            <button onclick="copyJSON()">Copy JSON</button>
+            <button onclick="downloadJSON()">Download JSON</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loader"></div>
+    <p>Analyzing Genetic Risk...</p>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
