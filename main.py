@@ -105,16 +105,12 @@ Return only raw JSON.
 def call_cohere(prompt):
     response = co.chat(
         model="command-a-03-2025",
-        messages=[
-            {"role": "system", "content": "Return strict JSON only."},
-            {"role": "user", "content": prompt}
-        ],
+        message=prompt,
         temperature=0.1
     )
 
-    raw_text = response.message.content[0].text.strip()
+    raw_text = response.text.strip()
 
-    # Extract JSON safely
     try:
         start = raw_text.index("{")
         end = raw_text.rindex("}") + 1
