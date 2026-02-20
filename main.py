@@ -31,14 +31,53 @@ def serve_frontend():
 co = cohere.Client(os.getenv("COHERE_API_KEY"))
 
 
-def parse_vcf(contents: str):
-    """
-    Basic mock VCF parsing.
-    Extracts rsIDs for demo purposes.
-    """
-    genes = ["CYP2D6"]
+# def parse_vcf(contents: str):
+#     """
+#     Basic mock VCF parsing.
+#     Extracts rsIDs for demo purposes.
+#     """
+#     genes = ["CYP2D6"]
+#     rsids = []
+#     star_alleles = ["*1/*4"]
+
+#     for line in contents.splitlines():
+#         if line.startswith("rs"):
+#             rsids.append(line.split()[0])
+
+#     return {
+#         "patient_id": "PATIENT_" + str(abs(hash(contents)) % 100000),
+#         "genes": genes,
+#         "rsids": rsids[:3] if rsids else ["rs123456"],
+#         "star_alleles": star_alleles
+#     }
+
+def parse_vcf(contents: str, drug: str):
+
+    drug = drug.upper()
+
+    # Map drugs to pharmacogenes
+    drug_gene_map = {
+        "WARFARIN": ["CYP2C9", "VKORC1"],
+        "ABACAVIR": ["HLA-B"],
+        "CODEINE": ["CYP2D6"],
+        "TACROLIMUS": ["CYP3A5"]
+    }
+
+    genes = drug_gene_map.get(drug, ["CYP2D6"])
+
     rsids = []
-    star_alleles = ["*1/*4"]
+
+    # Demo alleles based on drug for visible risk
+    if drug == "WARFARIN":
+        star_alleles = ["*3/*3"]  # poor metabolizer → dose adjustment
+    elif drug == "CODEINE":
+        star_alleles = ["*1/*1xN"]  # ultra rapid
+    elif drug == "ABACAVIR":
+        star_alleles = ["HLA-B*57:01"]
+    elif drug == "TACROLIMUS":
+        star_alleles = ["*3/*3"]
+    else:
+        star_alleles = ["*1/*4"]
 
     for line in contents.splitlines():
         if line.startswith("rs"):
@@ -50,7 +89,6 @@ def parse_vcf(contents: str):
         "rsids": rsids[:3] if rsids else ["rs123456"],
         "star_alleles": star_alleles
     }
-
 
 def build_prompt(parsed_data, drug):
     return f"""
@@ -156,7 +194,7 @@ async def analyze(
         contents = await file.read()
         decoded = contents.decode("utf-8", errors="ignore")
 
-        parsed_data = parse_vcf(decoded)
+        parsed_data = parse_vcf(decoded, drug)
         prompt = build_prompt(parsed_data, drug)
         result = call_cohere(prompt)
 
