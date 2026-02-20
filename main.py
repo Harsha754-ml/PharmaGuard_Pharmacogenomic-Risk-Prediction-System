@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import cohere
 import os
+import json  
 
 app = FastAPI()
 
