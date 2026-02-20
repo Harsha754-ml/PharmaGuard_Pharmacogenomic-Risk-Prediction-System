@@ -102,6 +102,25 @@ Return only raw JSON.
 """
 
 
+# def call_cohere(prompt):
+#     response = co.chat(
+#         model="command-a-03-2025",
+#         message=prompt,
+#         temperature=0.1
+#     )
+
+#     raw_text = response.text.strip()
+
+#     try:
+#         start = raw_text.index("{")
+#         end = raw_text.rindex("}") + 1
+#         return raw_text[start:end]
+#     except:
+#         return JSONResponse(
+#             status_code=500,
+#             content={"error": "Model returned invalid JSON"}
+#         )
+
 def call_cohere(prompt):
     response = co.chat(
         model="command-a-03-2025",
@@ -114,11 +133,17 @@ def call_cohere(prompt):
     try:
         start = raw_text.index("{")
         end = raw_text.rindex("}") + 1
-        return raw_text[start:end]
-    except:
+        json_str = raw_text[start:end]
+
+        # Convert string to Python dict
+        parsed_json = json.loads(json_str)
+
+        return parsed_json  # RETURN DICTIONARY, NOT STRING
+
+    except Exception as e:
         return JSONResponse(
             status_code=500,
-            content={"error": "Model returned invalid JSON"}
+            content={"error": "Model returned invalid JSON", "details": str(e)}
         )
         
 @app.post("/analyze")
